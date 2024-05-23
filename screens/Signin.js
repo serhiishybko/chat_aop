@@ -14,25 +14,10 @@ import { signInWithEmailAndPassword } from "firebase/auth/react-native";
 import { auth } from "../utils/firebase";
 
 const SignIn = ({ navigation }) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  // const storeEmail = async () => {
-  //   try {
-  //     await AsyncStorage.setItem("email", email);
-  //     await AsyncStorage.setItem("password", password);
-  //     navigation.navigate("Messaging");
-  //   } catch (e) {
-  //     Alert.alert("Error! While saving info");
-  //   }
-  // };
+  const [email, setEmail] = useState("w.golli@qinsights.ai");
+  const [password, setPassword] = useState("test123456");
 
   const handleSignIn = () => {
-    // if (email.trim() && password.trim()) {
-    //   storeEmail();
-    // } else {
-    //   Alert.alert("Email and Password is required.");
-    // }
     if (email !== "" && password !== "") {
       signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
@@ -57,21 +42,6 @@ const SignIn = ({ navigation }) => {
       Alert.alert("Email and Password is required.");
     }
   };
-
-  // useLayoutEffect(() => {
-  //   const getEmail = async () => {
-  //     try {
-  //       const email = await AsyncStorage.getItem("email");
-  //       const password = await AsyncStorage.getItem("email");
-  //       if (email !== null || password !== null) {
-  //         navigation.navigate("Messaging");
-  //       }
-  //     } catch (e) {
-  //       console.error("Error while loading email or password!");
-  //     }
-  //   };
-  //   getEmail();
-  // }, []);
 
   return (
     <View style={styles.loginscreen}>
