@@ -9,56 +9,69 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { styles } from "../utils/styles";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { signInWithEmailAndPassword } from "firebase/auth";
+// import AsyncStorage from "@react-native-async-storage/async-storage";
+import { signInWithEmailAndPassword } from "firebase/auth/react-native";
+import { auth } from "../utils/firebase";
 
 const SignIn = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const storeEmail = async () => {
-    try {
-      await AsyncStorage.setItem("email", email);
-      await AsyncStorage.setItem("password", password);
-      navigation.navigate("Chat");
-    } catch (e) {
-      Alert.alert("Error! While saving info");
-    }
-  };
+  // const storeEmail = async () => {
+  //   try {
+  //     await AsyncStorage.setItem("email", email);
+  //     await AsyncStorage.setItem("password", password);
+  //     navigation.navigate("Messaging");
+  //   } catch (e) {
+  //     Alert.alert("Error! While saving info");
+  //   }
+  // };
 
   const handleSignIn = () => {
-    if (email.trim() && password.trim()) {
-      storeEmail();
+    // if (email.trim() && password.trim()) {
+    //   storeEmail();
+    // } else {
+    //   Alert.alert("Email and Password is required.");
+    // }
+    if (email !== "" && password !== "") {
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          return userCredential.user.getIdToken();
+        })
+        .then((idToken) => {
+          fetch("https://api.finanalyst.ai/login/", {
+            method: "POST",
+            email: email,
+            password: password,
+            headers: {
+              "Content-type": "application/json",
+              "X-CSRFToken": "Bearer " + idToken,
+            },
+          });
+        })
+        .then(() => {
+          navigation.navigate("Messaging");
+        })
+        .catch((err) => Alert.alert("Login error", err.message));
     } else {
       Alert.alert("Email and Password is required.");
     }
   };
 
-  // const handleSignIn = () => {
-  //   console.log(auth, email, password);
-  //   if (email !== "" && password !== "") {
-  //     signInWithEmailAndPassword(auth, email, password)
-  //       .then(() => console.log("Login success"))
-  //       .catch((err) => Alert.alert("Login error", err.message));
-  //   } else {
-  //     Alert.alert("Email and Password are require");
-  //   }
-  // };
-
-  useLayoutEffect(() => {
-    const getEmail = async () => {
-      try {
-        const email = await AsyncStorage.getItem("email");
-        const password = await AsyncStorage.getItem("email");
-        if (email !== null || password !== null) {
-          navigation.navigate("Chat");
-        }
-      } catch (e) {
-        console.error("Error while loading email or password!");
-      }
-    };
-    getEmail();
-  }, []);
+  // useLayoutEffect(() => {
+  //   const getEmail = async () => {
+  //     try {
+  //       const email = await AsyncStorage.getItem("email");
+  //       const password = await AsyncStorage.getItem("email");
+  //       if (email !== null || password !== null) {
+  //         navigation.navigate("Messaging");
+  //       }
+  //     } catch (e) {
+  //       console.error("Error while loading email or password!");
+  //     }
+  //   };
+  //   getEmail();
+  // }, []);
 
   return (
     <View style={styles.loginscreen}>
